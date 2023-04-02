@@ -8,4 +8,6 @@ module.exports = {
     "^@src/(.*)\\.js$": "<rootDir>/src/$1",
     "^(\\.{1,2}/.*)\\.js$": "$1",
   },
+  // transform: {},
+  extensionsToTreatAsEsm: [".ts"],
 };
