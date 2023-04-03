@@ -1,10 +1,18 @@
+import { ObjectId } from "mongodb";
+import { CreateResultInterface, DocumentInterface } from "@src/database/connection";
+
 interface customer {
   _id: string;
   name: string;
   phone: string;
 }
 
-interface CreateItemInterface {
+interface ItemConverterInterface {
+  name: string;
+  multiply: number;
+}
+
+export interface CreateItemInterface extends DocumentInterface {
   _id: string;
   code: string;
   name: string;
@@ -12,29 +20,27 @@ interface CreateItemInterface {
   hasProductionNumber: boolean;
   hasExpiryDate: boolean;
   unit: string;
-  converter: [
-    {
-      name: string;
-      multiply: number;
-    }
-  ];
+  converter: ItemConverterInterface[];
 }
 
-export interface ItemInterface extends CreateItemInterface {
+export interface ItemInterface extends CreateItemInterface, CreateResultInterface {
+  _id: string;
   createdAt: Date;
   createBy_id: string;
-  // _id: string;
-  // customer_id: customer;
-  // date: Date;
-  // total: string[];
 }
 
 export const restricted = [];
 
 export class ItemEntity {
-  public item: ItemInterface | CreateItemInterface;
+  public item: ItemInterface;
 
-  constructor(item: ItemInterface | CreateItemInterface) {
-    this.item = item;
+  constructor(item: CreateItemInterface) {
+    this.item = {
+      ...item,
+      _id: ObjectId.toString(),
+      createdAt: new Date(),
+      createBy_id: item._id,
+      acknowledged: true,
+    };
   }
 }
