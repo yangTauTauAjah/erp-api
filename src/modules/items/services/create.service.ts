@@ -1,5 +1,5 @@
 // import { ObjectId } from "mongodb";
-import { CreateItemInterface, ItemEntity } from "../entities/item.entity.js";
+import { CreateItemInterface, ItemEntity, ItemInterface } from "../entities/item.entity.js";
 import { ItemRepository } from "../repositories/item.repository.js";
 import DatabaseConnection /* , { DocumentInterface } */ from "@src/database/connection.js";
 
@@ -9,8 +9,9 @@ export class CreateItemService {
     this.db = db;
   }
 
-  public async handle(doc: CreateItemInterface, session: unknown) {
+  public async handle(doc: CreateItemInterface, session: unknown): Promise<ItemInterface> {
     const itemEntity = new ItemEntity({
+      _id: doc._id,
       code: doc.code,
       name: doc.name,
       chartOfAccount: doc.chartOfAccount,
@@ -20,7 +21,11 @@ export class CreateItemService {
       converter: doc.converter,
     });
 
-    const itemRepository = new ItemRepository(this.db);
-    return await itemRepository.create(itemEntity.item, { session });
+    const { _id, acknowledged } = await new ItemRepository(this.db).create(itemEntity.item, { session });
+    return {
+      ...itemEntity.item,
+      _id,
+      acknowledged,
+    };
   }
 }
